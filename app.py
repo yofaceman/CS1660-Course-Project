@@ -1,19 +1,43 @@
 import tarfile
 import time
+import os
+
+fileList = []
 
 def readFiles():
-    input_files = input("enter files here: ")
+    
+    input_files = input("enter files here, if multiple files seperate each with a space: ")
     input_files = input_files.split(" ")
+    
     try:
-        print(input_files)
+        ##print(input_files)
         for item in input_files:
-            print(item)
+            if(os.path.isdir(item[:-7])):
+                for root, dirs, files in os.walk(item[:-7]):
+                    for fileName in files:
+                        fileList.append(fileName)
+                        ##Send File to second application
+                continue
+            file = tarfile.open('Data/'+item)
+            file.extractall('./'+item[:-7])
+            file.close()
+            for root, dirs, files in os.walk(item[:-7]):
+                for fileName in files:
+                    fileList.append(fileName)
+                    ##Send file to second application
+
+        x = 1
+        print('\n\nTHIS IS THE LIST OF FILES TO BE INDEXED\n\n')
+        for file in fileList:
+            print(str(x)+'.'+file)
+            x = x+1
+        print('\n\nTHIS IS THE LIST OF FILES TO BE INDEXED\n\n')
         loadPage()
     except Exception as e:
         print(e)
 
 def loadPage():
-    user_input = input("Would you like to...(Please type corresponding number)\n1. Input Different Files\n2. Load Engine \n")
+    user_input = input("\nWould you like to...(Please type corresponding number)\n1. Input Different Files\n2. Load Engine \n")
     if(user_input == "1"):
         readFiles()
     elif(user_input == "2"):
@@ -23,7 +47,7 @@ def loadPage():
         loadPage()
     
 def loadEngine():
-    print("Engine was loaded & Inverted indicies were constructed successfully!")
+    print("\nEngine was loaded & Inverted indicies were constructed successfully!")
     user_input = input("Please Select Action...(type corresponding number)\n1.Search for Term\n2.Top-N\n")
     if(user_input == "1"):
         searchPage()
@@ -34,12 +58,12 @@ def loadEngine():
         loadEngine()
 
 def searchPage():
-    user_input = input("Enter Your Search Term\n")
+    user_input = input("\nEnter Your Search Term\n")
     start = time.time()
     searchResultsPage(user_input, start)
 
 def searchResultsPage(user_input, start):
-    print("You searched for the term:" + user_input)
+    print("\nYou searched for the term:" + user_input)
     time.sleep(1)
     end = time.time()
     print("\nYour search was executed in {}ms".format((end-start)*1000))
@@ -49,13 +73,13 @@ def searchResultsPage(user_input, start):
     loadEngine()
 
 def nValuePage():
-    user_input = input("Enter Your N Value\n")
+    user_input = input("\nEnter Your N Value\n")
     start = time.time()
     nValueResultsPage(user_input)
 
 def nValueResultsPage(user_input):
-    print("Top-N Frequent Terms")
-    x =input("Press [Enter] to go back to Search (or type 'EXIT' to quit the program)")
+    print("\nTop-N Frequent Terms")
+    x =input("Press [Enter] to go back to Search (or type 'EXIT' to quit the program)\n")
     if(x == "EXIT"):
         exit(0)
     loadEngine()
