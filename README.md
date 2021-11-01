@@ -1,8 +1,8 @@
 # CS1660-Course-Project
  
 # How to run application on client side
-1. In terminal type "docker build -t mattarndt/project2 ."
-2. Next in terminal type "docker run -i mattarndt/project2"
+1. To build the project, In terminal type "docker build -t mattarndt/project2 ."
+2. To run the project, in terminal type "docker run -i mattarndt/project2"
 3. You will then be presented with a simple terminal based program
 
 # Step to be used to connect to GCP
@@ -14,5 +14,5 @@ the cloudbuild.yaml file interactive when building it in the GCP console.
 
 
 # Assumptions Made
-An assumption is made that the user can only choose from the files from the sample directory labeled "Data"
-Additionally that all files in the Data directory would be in the format .tar.gz
+An assumption is made that the user can only choose from the files from the sample directory labeled "Data".
+Additionally, all files in the Data directory would be in the format .tar.gz
