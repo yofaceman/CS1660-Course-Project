@@ -1,18 +1,33 @@
 # CS1660-Course-Project
  
 # How to run application on client side
+To preface, this program is not able to communicate with GCP to dynamically create inverted indices given different files. This application is running off a pre-made inverted index based off the files in shakespeare.tar.gz 
 1. To build the project, In terminal type "docker build -t mattarndt/project2 ."
 2. To run the project, in terminal type "docker run -i mattarndt/project2"
-3. You will then be presented with a simple terminal based program
+3. When entering files the only acceptable files are {shakespeare.tar.gz, Hugo.tar.gz, Tolstoy.tar.gz}
+4. When selecting a top-N value the value must be an integer
 
-# Step to be used to connect to GCP
-In my main application I would create a secure connection with GCP using the JSON file with authentication keys. I would send each files 
-contents over to be used analyzed and indexed by the second application. However I have yet to make that secure connection in my code.
-I am also unsure if we are to deploy our Docker container on GCP or if it will be deployed on the clientside. If it is to be deployed on 
-then changes will have to be made to the Dockerfile RUN command to work on a linux system and I will need to figure out how to make 
-the cloudbuild.yaml file interactive when building it in the GCP console. 
+# How to run inverted index algorithm
+1. Upload InvertedIndex.java to staging bucket
+2. Open SSH with Master Cluster
+3. input "gsutil cp -r gs://dataproc-staging-us-east1-1006853791664-q5dte3pd/Shakespeare ./Project2/ "
+4. gsutil cp -r gs://dataproc-staging-us-east1-1006853791664-q5dte3pd/InvertedIndex.java ./Project2/ 
+5. hadoop fs -put ./Project2/Shakespeare /ShakespeareInput
+6. cd Project2
+7. javac InvertedIndex*.java -cp $(hadoop classpath)
+8. jar cf invert.jar InvertedIndex*.class
+9. hadoop jar invert.jar InvertedIndex /ShakespeareInput /ShakespeareOutput
+10. hadoop fs -getmerge /ShakespeareOutput ShakeOut
+11. gsutil cp ShakeOut gs://dataproc-staging-us-east1-1006853791664-q5dte3pd/
+12. Now the file ShakeOut which contains the inverted index should be in your GCP bucket 
+13. Download ShakeOut to your local machine and store it where you build your dockerfile
+
+
+# Problems with Application
+This application has no way to send data between the GCP VM, which runs the MapReduce algorithm that produces the inverted index, and the Docker container which sends to GCP which files it would like count and index.Due to this I have to manually add files to the GCP Bucket, open an SSH, compile and run the Inverted Index MapReduce algorithm on the input files uploaded to GCP. Then download the output file to my local machine to be used and interpreted by the client application.
 
 
 # Assumptions Made
-An assumption is made that the user can only choose from the files from the sample directory labeled "Data".
-Additionally, all files in the Data directory would be in the format .tar.gz
+-Users can only upload from the following files{shakespeare.tar.gz, Hugo.tar.gz, Tolstoy.tar.gz}
+-Users do not make mistakes when entering information into terminal
+-User is able to run docker containers on their computer
